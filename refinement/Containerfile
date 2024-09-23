@@ -1,8 +1,9 @@
 FROM  pytorch/pytorch:2.3.1-cuda12.1-cudnn8-devel
 RUN apt-get update
 WORKDIR /usr/app/src
-RUN pip install pandas tensorflow[cuda]
-RUN pip install spacy scikit-learn
+RUN pip install pandas tensorflow[cuda] jira[cli] keras tensorflow keras-preprocessing xgboost lightgbm catboost nltk spacy scikit-learn
 RUN python -m spacy download en
-COPY init.py .
 COPY main.py .
+RUN mkdir -p refinement/training/refined
+RUN mkdir -p refinement/training/unrefined
+CMD python main.py
