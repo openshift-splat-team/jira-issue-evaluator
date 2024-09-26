@@ -1,0 +1,47 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: jira-issue-assistant
+  namespace: vsphere-infra-helpers
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jira-issue-assistant
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: jira-issue-assistant
+    spec:
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      terminationGracePeriodSeconds: 30
+      securityContext: {}
+      containers:
+        - resources: {}
+          terminationMessagePath: /dev/termination-log
+          name: container
+          command:
+            - python
+          env:
+            - name: HOME
+              value: /usr/app/src
+          securityContext:
+            privileged: true
+          ports:
+            - containerPort: 8002
+              protocol: TCP
+          imagePullPolicy: Always
+          terminationMessagePolicy: File
+          image: ''
+          args:
+            - main.py      
+      dnsPolicy: ClusterFirst
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 25%
+  revisionHistoryLimit: 10
+  progressDeadlineSeconds: 600
