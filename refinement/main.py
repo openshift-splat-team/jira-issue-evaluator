@@ -45,6 +45,10 @@ from tensorflow.keras import layers
 nltk.download('stopwords')
 nltk.download('wordnet')
 
+poll_rate_minutes = 60
+if "POLL_RATE" in os.environ:
+    poll_rate_minutes = int(os.environ["POLL_RATE"])
+
 def initializeBackend():
     """
     reinitializes keras and configures random seeds to ensure training and evaluation consistency.
@@ -256,4 +260,4 @@ while True:
             for new_label in new_labels:
                 labels.append(new_label)
             issue.update(fields={"labels": labels})
-    time.sleep(60 * 60 * 12)
+    time.sleep(60 * poll_rate_minutes)
