@@ -1,0 +1,6 @@
+FROM  pytorch/pytorch:2.3.1-cuda12.1-cudnn8-devel
+RUN apt-get update
+WORKDIR /usr/app/src
+RUN pip install ollama
+COPY main.py .
+CMD python main.py

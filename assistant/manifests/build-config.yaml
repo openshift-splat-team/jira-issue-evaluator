@@ -1,0 +1,37 @@
+kind: BuildConfig
+apiVersion: build.openshift.io/v1
+metadata:
+  name: jira-issue-assistant
+  namespace: vsphere-infra-helpers
+spec:
+  nodeSelector: null
+  output:
+    to:
+      kind: ImageStreamTag
+      name: 'jira-issue-assistant:latest'
+  resources: {}
+  successfulBuildsHistoryLimit: 1
+  failedBuildsHistoryLimit: 1
+  strategy:
+    type: Docker
+    dockerStrategy:
+      from:
+        kind: DockerImage
+        name: 'docker.io/pytorch/pytorch:2.3.1-cuda12.1-cudnn8-devel'
+      env:
+        - name: IMAGE
+          value: ''
+      dockerfilePath: Containerfile
+  postCommit: {}
+  source:
+    type: Git
+    git:
+      uri: 'https://github.com/openshift-splat-team/jira-issue-evaluator'
+      ref: main
+    contextDir: /assistant
+  triggers:
+    - type: GitHub
+      github:
+        secretReference:
+          name: splatbot-webhook
+  runPolicy: Serial
