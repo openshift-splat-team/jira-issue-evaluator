@@ -151,6 +151,23 @@ def isReadyForRefinement(issue):
     prob = result.ravel()[0]
     return result.ravel()[0] < 0.50, prob
 
+SIZING_FIELD_1 = "customfield_12314040"
+SIZING_FIELD_2 = "customfield_12310243"
+
+def syncStoryPoints(issues):
+    print("syncing story points")
+
+    for issue in issues:
+        val1 = issue.raw["fields"][SIZING_FIELD_1]
+        val2 = issue.raw["fields"][SIZING_FIELD_2]
+        
+        if val1 == None and val2 != None:
+            print("syncing", issue.key)
+            issue.update(fields={SIZING_FIELD_1: val2})
+        elif val2 == None and val1 != None:
+            print("syncing", issue.key)
+            issue.update(fields={SIZING_FIELD_2: val1})
+
 splitDataframeToDirectory("refinement/training/", df)
 
 batch_size = 32
@@ -236,6 +253,9 @@ jira = JIRA(server=jira_url,
            token_auth=jira_token)
 
 while True:
+    issues = cast(ResultList[Issue], jira.search_issues(jql_str='project in (SPLAT, OPCT) AND created > -26w AND status not in (Closed) AND creator not in (cucushift-bot, sgaoshang, "yanhli@redhat.com") AND issuetype not in (Epic) AND ("Story Points" is not EMPTY OR cf[12314040] is not EMPTY)'))
+    syncStoryPoints(issues)
+
     issues = cast(ResultList[Issue], jira.search_issues(jql_str='project in (SPLAT, OPCT) AND created > -26w AND status not in (Closed) AND creator not in (cucushift-bot, sgaoshang, "yanhli@redhat.com") AND issuetype not in (Epic) AND (labels in (needs-refinement) OR priority = Undefined or "Story Points" IS EMPTY ) AND status  != Closed ORDER BY key DESC, priority ASC, created ASC, Rank ASC'))
     for issuekey in issues:
         issue = jira.issue(issuekey)
