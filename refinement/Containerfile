@@ -1,10 +1,8 @@
-FROM pytorch/pytorch:2.5.1-cuda12.4-cudnn9-devel
-RUN apt-get update
+FROM registry.access.redhat.com/ubi9/python-311@sha256:232487f27faed8417ea2fe3f6cdc4a5b8054894e44b2033e3a1548f1e1a1a08a
+#RUN apt-get update
 WORKDIR /usr/app/src
 
-RUN pip install pandas tensorflow[cuda] jira[cli] keras tensorflow keras-preprocessing nltk spacy scikit-learn 
-RUN python -m spacy download en
+RUN pip install pandas jira[cli] spacy scikit-learn classy-classification
+RUN python -m spacy download en_core_web_md
 COPY main.py .
-RUN mkdir -p refinement/training/refined
-RUN mkdir -p refinement/training/unrefined 
-CMD python main.py
+CMD python main.py --train-files /training/training.csv
